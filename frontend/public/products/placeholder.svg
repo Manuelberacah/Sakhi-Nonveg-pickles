@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" fill="none">
+  <rect width="800" height="600" fill="#111111"/>
+  <circle cx="400" cy="300" r="180" fill="#C10F1A" fill-opacity="0.2"/>
+  <text x="400" y="285" text-anchor="middle" fill="#F6BE00" font-size="44" font-family="Arial, sans-serif" font-weight="700">Sakhi Pickles</text>
+  <text x="400" y="340" text-anchor="middle" fill="#FFFFFF" font-size="28" font-family="Arial, sans-serif">Image Loading</text>
+</svg>

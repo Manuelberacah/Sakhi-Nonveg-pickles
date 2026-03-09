@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-brandBlack text-white antialiased;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(246, 190, 0, 0.14), transparent 36%),
+    radial-gradient(circle at 85% 20%, rgba(193, 15, 26, 0.2), transparent 32%),
+    linear-gradient(180deg, #070707 0%, #131313 100%);
+  min-height: 100vh;
+}
+
+html.light body {
+  color: #111827;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(246, 190, 0, 0.08), transparent 36%),
+    radial-gradient(circle at 85% 20%, rgba(193, 15, 26, 0.08), transparent 32%),
+    linear-gradient(180deg, #f7f7f7 0%, #efefef 100%);
+}
+
+html.light .brand-card {
+  @apply border-black/10 bg-white/85 text-black;
+}
+
+html.light .brand-btn-primary {
+  @apply bg-brandRed text-white hover:bg-red-700;
+}
+
+html.light .brand-btn-secondary {
+  @apply bg-brandYellow text-black hover:bg-yellow-500;
+}
+
+.brand-card {
+  @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md;
+}
+
+.brand-btn {
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-semibold transition;
+}
+
+.brand-btn-primary {
+  @apply brand-btn bg-brandRed text-white hover:bg-red-700;
+}
+
+.brand-btn-secondary {
+  @apply brand-btn bg-brandYellow text-black hover:bg-yellow-400;
+}
+
+.adaptive-text {
+  @apply text-white;
+}
+
+.adaptive-muted {
+  @apply text-white/80;
+}
+
+.adaptive-input {
+  @apply border-white/20 bg-black/30 text-white;
+}
+
+html.light .adaptive-text {
+  @apply text-black;
+}
+
+html.light .adaptive-muted {
+  @apply text-black/70;
+}
+
+html.light .adaptive-input {
+  @apply border-black/15 bg-slate-200 text-black;
+}
