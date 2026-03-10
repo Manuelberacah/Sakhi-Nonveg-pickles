@@ -6,15 +6,18 @@ import { getDeliveryCharge } from "../utils/delivery.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || "",
-  key_secret: process.env.RAZORPAY_KEY_SECRET || ""
-});
-
 const assertRazorpayConfig = () => {
   if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
     throw new Error("Razorpay config missing (RAZORPAY_KEY_ID/RAZORPAY_KEY_SECRET)");
   }
+};
+
+const getRazorpayClient = () => {
+  assertRazorpayConfig();
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+  });
 };
 
 export const checkout = async (req, res) => {
@@ -107,6 +110,7 @@ export const createRazorpayOrder = async (req, res) => {
     const deliveryCharge = getDeliveryCharge(region);
     const totalAmount = productsAmount + deliveryCharge;
 
+    const razorpay = getRazorpayClient();
     const order = await razorpay.orders.create({
       amount: Math.round(totalAmount * 100),
       currency: "INR",
