@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../../components/AppContext";
+import { getProductName } from "../../../lib/productI18n";
 
 const regionCharges = {
   "andhra-pradesh": 80,
@@ -12,6 +14,7 @@ const regionCharges = {
 
 export default function CartPage() {
   const { cart, updateCartItem, removeCartItem } = useApp();
+  const { i18n, t } = useTranslation();
 
   const subtotal = useMemo(
     () =>
@@ -32,10 +35,11 @@ export default function CartPage() {
       {cart.map((item) => {
         const price = item.product.prices[item.size];
         const rowSubtotal = price * item.quantity;
+        const productName = getProductName(item.product, i18n.language, t);
 
         return (
           <article key={`${item.product._id}-${item.size}`} className="brand-card p-4">
-            <h3 className="text-lg font-semibold">{item.product.name}</h3>
+            <h3 className="text-lg font-semibold">{productName}</h3>
             <p className="text-sm text-white/70">Size: {item.size}</p>
             <p className="text-sm text-white/70">Price: Rs.{price}</p>
             <div className="mt-3 flex items-center gap-2">

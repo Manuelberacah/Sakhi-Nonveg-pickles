@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useApp } from "./AppContext";
+import BackButton from "./BackButton";
 import ThemeToggle from "./ThemeToggle";
 
 const MainHeader = () => {
@@ -34,9 +35,12 @@ const MainHeader = () => {
   return (
     <header className="sticky top-0 z-30 border-b border-white/10 bg-black/70 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        <Link href="/home" className="text-lg font-extrabold text-brandYellow">
-          Sakhi Non-Veg Pickles
-        </Link>
+        <div className="flex items-center gap-3">
+          <BackButton />
+          <Link href="/home" className="text-lg font-extrabold text-brandYellow">
+            Sakhi Non-Veg Pickles
+          </Link>
+        </div>
         <div
           ref={dropdownRef}
           className="relative flex items-center gap-3"
@@ -56,7 +60,7 @@ const MainHeader = () => {
                 onClick={() => setOpen(false)}
                 className="block rounded-lg px-3 py-2 text-sm hover:bg-white/10"
               >
-                Updates
+                {t("updates")}
               </Link>
               <Link
                 href="/settings"

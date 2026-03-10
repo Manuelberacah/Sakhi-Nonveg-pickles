@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../../components/AppContext";
 import ProductCard from "../../../components/ProductCard";
 
 export default function HomePage() {
   const { products, loading } = useApp();
+  const { t } = useTranslation();
 
   const content = useMemo(() => {
     if (loading) return <p>Loading products...</p>;
@@ -22,8 +24,8 @@ export default function HomePage() {
   return (
     <section className="space-y-6">
       <div>
-        <h1 className="text-3xl font-black text-brandYellow">Our Pickles</h1>
-        <p className="mt-2 text-sm text-white/70">Small batch, homemade non-veg specials.</p>
+        <h1 className="text-3xl font-black text-brandYellow">{t("homeTitle")}</h1>
+        <p className="mt-2 text-sm text-white/70">{t("homeTagline")}</p>
       </div>
       {content}
     </section>

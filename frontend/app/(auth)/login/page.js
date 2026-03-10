@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../../../components/AppContext";
+import BackButton from "../../../components/BackButton";
 import ThemeToggle from "../../../components/ThemeToggle";
 import { api } from "../../../lib/api";
 
@@ -44,8 +46,15 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md items-center px-4">
-      <form onSubmit={handleSubmit} className="brand-card w-full space-y-4 p-6">
-        <div className="flex justify-end">
+      <motion.form
+        onSubmit={handleSubmit}
+        className="brand-card w-full space-y-4 p-6"
+        initial={{ opacity: 0, y: 22, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="flex items-center justify-between">
+          <BackButton fallbackHref="/landing" />
           <ThemeToggle />
         </div>
         <h1 className="text-2xl font-bold text-brandYellow">{t("login")}</h1>
@@ -72,15 +81,15 @@ export default function LoginPage() {
             checked={showPassword}
             onChange={(e) => setShowPassword(e.target.checked)}
           />
-          Show password
+          {t("showPassword")}
         </label>
         <button className="brand-btn-primary w-full" type="submit">
           {t("login")}
         </button>
         <p className="adaptive-muted text-sm">
-          New here? <Link href="/signup" className="text-brandYellow">{t("signup")}</Link>
+          {t("newHere")} <Link href="/signup" className="text-brandYellow">{t("signup")}</Link>
         </p>
-      </form>
+      </motion.form>
     </main>
   );
 }

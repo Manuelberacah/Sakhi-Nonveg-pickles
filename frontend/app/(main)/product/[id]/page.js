@@ -5,12 +5,13 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../../../../components/AppContext";
 import FallbackImage from "../../../../components/FallbackImage";
+import { getProductDescription, getProductName } from "../../../../lib/productI18n";
 import { whatsappUrl } from "../../../../lib/whatsapp";
 
 const sizes = ["250g", "500g", "1kg"];
 
 export default function ProductDetailsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const { products, addToCart, toggleWishlist, wishlist } = useApp();
   const [size, setSize] = useState("250g");
@@ -22,6 +23,8 @@ export default function ProductDetailsPage() {
 
   const price = product.prices[size];
   const inWishlist = wishlist.some((item) => item._id === product._id);
+  const productName = getProductName(product, i18n.language, t);
+  const productDescription = getProductDescription(product, i18n.language, t);
 
   const handleAddCart = async () => {
     await addToCart(product._id, size, 1);
@@ -36,12 +39,12 @@ export default function ProductDetailsPage() {
   return (
     <section className="grid gap-8 lg:grid-cols-2">
       <div className="relative h-80 overflow-hidden rounded-2xl border border-white/10">
-        <FallbackImage src={product.image} alt={product.name} fill className="object-cover" />
+        <FallbackImage src={product.image} alt={productName} fill className="object-cover" />
       </div>
 
       <div className="space-y-4">
-        <h1 className="text-3xl font-black text-brandYellow">{product.name}</h1>
-        <p className="text-white/80">{product.description}</p>
+        <h1 className="text-3xl font-black text-brandYellow">{productName}</h1>
+        <p className="text-white/80">{productDescription}</p>
 
         <div>
           <p className="mb-2 text-sm text-white/70">Select size</p>
@@ -72,7 +75,7 @@ export default function ProductDetailsPage() {
           </button>
           <a
             href={whatsappUrl(
-              `I want to order ${product.name} - ${size} (Rs.${price}) from Sakhi Non-Veg Pickles.`
+              `I want to order ${productName} - ${size} (Rs.${price}) from Sakhi Non-Veg Pickles.`
             )}
             target="_blank"
             rel="noreferrer"

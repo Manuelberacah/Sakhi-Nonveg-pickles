@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 import { useApp } from "./AppContext";
 import { whatsappUrl } from "../lib/whatsapp";
 
@@ -9,9 +10,12 @@ const FloatingWhatsApp = () => {
   const { t } = useTranslation();
   const pathname = usePathname();
   const { token } = useApp();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   const hiddenOn = ["/", "/landing", "/login", "/signup"];
-  if (!token || hiddenOn.includes(pathname)) return null;
+  if (!mounted || !token || hiddenOn.includes(pathname)) return null;
 
   return (
     <a

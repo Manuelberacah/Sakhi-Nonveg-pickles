@@ -8,8 +8,10 @@ const ADMIN_TOKEN_KEY = "sakhi_admin_token";
 
 const emptyProduct = {
   name: "",
+  nameTe: "",
   image: "",
   description: "",
+  descriptionTe: "",
   prices: { "250g": "", "500g": "", "1kg": "" }
 };
 const emptyUpdate = { title: "", content: "", type: "update", mediaUrl: "" };
@@ -83,8 +85,10 @@ export default function AdminPage() {
 
     const payload = {
       name: form.name,
+      nameTe: form.nameTe,
       image: form.image,
       description: form.description,
+      descriptionTe: form.descriptionTe,
       prices: parsedPrices
     };
 
@@ -108,8 +112,10 @@ export default function AdminPage() {
     setEditingId(item._id);
     setForm({
       name: item.name,
+      nameTe: item.nameTe || "",
       image: item.image,
       description: item.description,
+      descriptionTe: item.descriptionTe || "",
       prices: {
         "250g": item.prices["250g"],
         "500g": item.prices["500g"],
@@ -188,6 +194,12 @@ export default function AdminPage() {
             onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
           />
           <input
+            placeholder="Name (Telugu)"
+            className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
+            value={form.nameTe}
+            onChange={(e) => setForm((prev) => ({ ...prev, nameTe: e.target.value }))}
+          />
+          <input
             placeholder="Image path or URL (example: /products/chicken.png.jpg)"
             required
             className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
@@ -200,6 +212,12 @@ export default function AdminPage() {
             className="h-20 w-full rounded-xl border border-white/20 bg-black/30 p-3"
             value={form.description}
             onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+          />
+          <textarea
+            placeholder="Description (Telugu)"
+            className="h-20 w-full rounded-xl border border-white/20 bg-black/30 p-3"
+            value={form.descriptionTe}
+            onChange={(e) => setForm((prev) => ({ ...prev, descriptionTe: e.target.value }))}
           />
           <div className="grid gap-3 md:grid-cols-3">
             {["250g", "500g", "1kg"].map((size) => (

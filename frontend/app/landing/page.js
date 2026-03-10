@@ -2,49 +2,98 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { useState } from "react";
-
-const sections = [
-  {
-    image: "/products/chicken.png.jpg",
-    title: "Traditional Fire, Modern Hygiene",
-    description:
-      "Every Sakhi jar is prepared in controlled, clean batches while preserving the bold, old-school Andhra pickle character meat lovers crave."
-  },
-  {
-    image: "/products/mutton.png.jpg",
-    title: "Premium Cuts, Rich Masala Depth",
-    description:
-      "From careful meat selection to slow spice layering, our process builds flavor in stages so each spoonful tastes deep, balanced, and memorable."
-  },
-  {
-    image: "/products/prawn.png.png",
-    title: "Coastal Heat With a Bright Finish",
-    description:
-      "Our prawn profile blends sea-fresh savoriness with vibrant spice and tang, giving your rice and rotis a punchy, satisfying finish."
-  },
-  {
-    image: "/products/fish.png.jpg",
-    title: "Homemade Soul in Every Jar",
-    description:
-      "No shortcuts, no artificial taste boosters. Just careful home-style cooking, premium spices, and the confidence of preservative-free flavor."
-  },
-  {
-    image: "/products/gongura-chicken.png.jpg",
-    title: "Signature Boldness for Meat Lovers",
-    description:
-      "From chicken to mutton, fish to prawns, every variant is crafted to feel distinct yet unmistakably Sakhi: bold, authentic, and addictive."
-  }
-];
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import i18n from "../../lib/i18n";
+import { useTranslation } from "react-i18next";
+import ThemeToggle from "../../components/ThemeToggle";
 
 export default function LandingPage() {
+  const { t } = useTranslation();
   const [logoSrc, setLogoSrc] = useState("/brand/logo.png");
   const [heroSrc, setHeroSrc] = useState("/brand/logo-full.png.jpg");
+  const [showLang, setShowLang] = useState(true);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("sakhi_lang");
+    const allowed = ["en", "te"];
+    if (stored && allowed.includes(stored)) {
+      i18n.changeLanguage(stored);
+    }
+  }, []);
+
+  const setLanguage = (lang) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem("sakhi_lang", lang);
+    if (document?.documentElement) {
+      document.documentElement.lang = lang;
+    }
+    setShowLang(false);
+  };
+
+  const sections = [
+    {
+      image: "/products/chicken.png.jpg",
+      title: t("landingSection1Title"),
+      description: t("landingSection1Desc")
+    },
+    {
+      image: "/products/mutton.png.jpg",
+      title: t("landingSection2Title"),
+      description: t("landingSection2Desc")
+    },
+    {
+      image: "/products/prawn.png.png",
+      title: t("landingSection3Title"),
+      description: t("landingSection3Desc")
+    },
+    {
+      image: "/products/fish.png.jpg",
+      title: t("landingSection4Title"),
+      description: t("landingSection4Desc")
+    },
+    {
+      image: "/products/gongura-chicken.png.jpg",
+      title: t("landingSection5Title"),
+      description: t("landingSection5Desc")
+    }
+  ];
 
   return (
     <main className="pb-16">
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/75 backdrop-blur-md">
+      <AnimatePresence>
+        {showLang ? (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <motion.div
+              className="brand-card w-full max-w-sm space-y-4 p-6"
+              initial={{ opacity: 0, y: 28, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 14, scale: 0.99 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <h2 className="text-xl font-bold text-brandYellow">{t("landingChooseLanguageTitle")}</h2>
+              <p className="adaptive-muted text-sm">{t("landingChooseLanguageBody")}</p>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setLanguage("en")} className="brand-btn-primary w-full">
+                  {t("english")}
+                </button>
+                <button type="button" onClick={() => setLanguage("te")} className="brand-btn-secondary w-full">
+                  {t("telugu")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+      {showLang ? null : (
+        <>
+          <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/75 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="relative h-10 w-12 overflow-hidden rounded-lg border border-white/20 bg-black">
@@ -56,14 +105,15 @@ export default function LandingPage() {
                 onError={() => setLogoSrc("/brand/logo-full.png.jpg")}
               />
             </div>
-            <p className="text-sm font-bold text-brandYellow md:text-base">Sakhi Non-Veg Pickles</p>
+            <p className="text-sm font-bold text-brandYellow md:text-base">{t("brandName")}</p>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link href="/login" className="rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold">
-              Login
+              {t("login")}
             </Link>
             <Link href="/signup" className="brand-btn-primary text-sm">
-              Sign Up
+              {t("signup")}
             </Link>
           </div>
         </div>
@@ -83,25 +133,24 @@ export default function LandingPage() {
         >
           <div className="space-y-4">
             <p className="inline-block rounded-full bg-brandRed/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-brandYellow">
-              Homemade Non-Veg Pickles
+              {t("landingPill")}
             </p>
             <h1 className="text-3xl font-black leading-tight text-brandYellow md:text-5xl">
-              A Bite of Bold, A Jar of Gold
+              {t("landingHeadline")}
             </h1>
             <p className="max-w-2xl text-base text-white/85 md:text-lg">
-              The perfect pickle for every meat lover. Preservative-free, premium meats and spices,
-              and crafted freshness delivered with consistency.
+              {t("landingIntro")}
             </p>
             <div className="grid gap-2 text-sm text-white/90">
               <p>
-                <span className="font-semibold text-brandYellow">Phone:</span> 8143156089, 80153 0090
+                <span className="font-semibold text-brandYellow">{t("landingPhoneLabel")}:</span> 8143156089, 80153 0090
               </p>
               <p>
-                <span className="font-semibold text-brandYellow">Email:</span>{" "}
+                <span className="font-semibold text-brandYellow">{t("landingEmailLabel")}:</span>{" "}
                 sakhinonvegsakhipickles.nonveg@gmail.com
               </p>
               <p>
-                <span className="font-semibold text-brandYellow">Address:</span> Anand Gokulam,
+                <span className="font-semibold text-brandYellow">{t("landingAddressLabel")}:</span> Anand Gokulam,
                 Teacher&apos;s layout, 301, Kommadi Rd, Gandhi Nagar, Madhurawada, Andhra Pradesh 530048
               </p>
             </div>
@@ -112,7 +161,7 @@ export default function LandingPage() {
                 rel="noreferrer"
                 className="rounded-xl bg-pink-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-pink-700"
               >
-                Instagram
+                {t("landingInstagram")}
               </a>
               <a
                 href="https://share.google/6HNSsh5Xaf5BHq8sQ"
@@ -120,7 +169,7 @@ export default function LandingPage() {
                 rel="noreferrer"
                 className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
-                Google
+                {t("landingGoogle")}
               </a>
               <a
                 href="https://maps.app.goo.gl/Jim7dmA1hwJJVc887?g_st=aw"
@@ -128,7 +177,7 @@ export default function LandingPage() {
                 rel="noreferrer"
                 className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
               >
-                Open Map
+                {t("landingOpenMap")}
               </a>
             </div>
           </div>
@@ -164,7 +213,7 @@ export default function LandingPage() {
                 <Image src={item.image} alt={item.title} fill className="object-cover transition duration-500 hover:scale-105" />
               </div>
               <div className={`${reverse ? "md:order-1" : ""} space-y-3`}>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brandRed">Sakhi Story</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brandRed">{t("landingStoryLabel")}</p>
                 <h2 className="text-2xl font-black text-brandYellow md:text-3xl">{item.title}</h2>
                 <p className="text-white/85">{item.description}</p>
               </div>
@@ -172,6 +221,8 @@ export default function LandingPage() {
           );
         })}
       </section>
+        </>
+      )}
     </main>
   );
 }

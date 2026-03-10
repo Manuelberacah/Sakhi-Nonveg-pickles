@@ -56,7 +56,7 @@ export const getProductsAdmin = async (_req, res) => {
 
 export const createProductAdmin = async (req, res) => {
   try {
-    const { name, image, description, prices } = req.body;
+    const { name, nameTe, image, description, descriptionTe, prices } = req.body;
 
     if (!name || !image || !description || !prices) {
       return res
@@ -72,9 +72,11 @@ export const createProductAdmin = async (req, res) => {
 
     const product = await Product.create({
       name,
+      nameTe,
       slug,
       image,
       description,
+      descriptionTe,
       prices
     });
 
@@ -87,7 +89,7 @@ export const createProductAdmin = async (req, res) => {
 export const updateProductAdmin = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, image, description, prices } = req.body;
+    const { name, nameTe, image, description, descriptionTe, prices } = req.body;
     const existing = await Product.findById(id);
 
     if (!existing) {
@@ -105,6 +107,12 @@ export const updateProductAdmin = async (req, res) => {
     existing.slug = nextSlug;
     existing.image = image || existing.image;
     existing.description = description || existing.description;
+    if (typeof nameTe === "string") {
+      existing.nameTe = nameTe;
+    }
+    if (typeof descriptionTe === "string") {
+      existing.descriptionTe = descriptionTe;
+    }
     existing.prices = prices || existing.prices;
 
     await existing.save();
@@ -143,4 +151,3 @@ export const getUsersAdmin = async (_req, res) => {
     return res.status(500).json({ message: "Failed to fetch users", error: error.message });
   }
 };
-

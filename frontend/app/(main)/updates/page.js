@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useApp } from "../../../components/AppContext";
 
 const types = ["update", "post", "reel"];
@@ -22,7 +23,7 @@ const instagramEmbedUrl = (url = "") => {
   return `${clean}/embed`;
 };
 
-const MediaPreview = ({ mediaUrl }) => {
+const MediaPreview = ({ mediaUrl, openLabel }) => {
   if (!mediaUrl) return null;
 
   const yt = youtubeEmbedUrl(mediaUrl);
@@ -88,13 +89,14 @@ const MediaPreview = ({ mediaUrl }) => {
       rel="noreferrer"
       className="mt-2 inline-block text-sm text-green-400 underline"
     >
-      Open media link
+      {openLabel}
     </a>
   );
 };
 
 export default function UpdatesPage() {
-  const { updates, createUpdate, removeUpdate } = useApp();
+  const { updates, createUpdate, removeUpdate, token } = useApp();
+  const { t } = useTranslation();
   const [adminToken, setAdminToken] = useState("");
   const [form, setForm] = useState({ title: "", content: "", type: "update", mediaUrl: "" });
   const [status, setStatus] = useState("");
@@ -105,7 +107,7 @@ export default function UpdatesPage() {
     setAdminToken(token);
   }, []);
 
-  const isAdmin = useMemo(() => Boolean(adminToken), [adminToken]);
+  const isAdmin = useMemo(() => Boolean(adminToken) && !token, [adminToken, token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -116,9 +118,9 @@ export default function UpdatesPage() {
     try {
       await createUpdate(form, adminToken);
       setForm({ title: "", content: "", type: "update", mediaUrl: "" });
-      setStatus("Update published.");
+      setStatus(t("updatesPublished"));
     } catch (error) {
-      setStatus(error.response?.data?.message || "Failed to publish update");
+      setStatus(error.response?.data?.message || t("updatesPublishFailed"));
     } finally {
       setLoading(false);
     }
@@ -128,28 +130,28 @@ export default function UpdatesPage() {
     try {
       await removeUpdate(id, adminToken);
     } catch (error) {
-      setStatus(error.response?.data?.message || "Failed to delete update");
+      setStatus(error.response?.data?.message || t("updatesPublishFailed"));
     }
   };
 
   return (
     <section className="mx-auto max-w-4xl space-y-6">
-      <h1 className="text-3xl font-black text-brandYellow">Updates</h1>
+      <h1 className="text-3xl font-black text-brandYellow">{t("updatesTitle")}</h1>
 
       {isAdmin ? (
         <form onSubmit={handleSubmit} className="brand-card space-y-3 p-4">
-          <h2 className="text-lg font-semibold">Create Update / Post / Reel</h2>
+          <h2 className="text-lg font-semibold">{t("updatesCreateTitle")}</h2>
           <input
             required
             value={form.title}
             onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-            placeholder="Title"
+            placeholder={t("updatesTitlePlaceholder")}
             className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
           />
           <textarea
             value={form.content}
             onChange={(e) => setForm((prev) => ({ ...prev, content: e.target.value }))}
-            placeholder="Description"
+            placeholder={t("updatesDescriptionPlaceholder")}
             className="h-24 w-full rounded-xl border border-white/20 bg-black/30 p-3"
           />
           <div className="grid gap-3 md:grid-cols-2">
@@ -167,21 +169,21 @@ export default function UpdatesPage() {
             <input
               value={form.mediaUrl}
               onChange={(e) => setForm((prev) => ({ ...prev, mediaUrl: e.target.value }))}
-              placeholder="Media URL (Instagram / YouTube / image / video)"
+              placeholder={t("updatesMediaPlaceholder")}
               className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
             />
           </div>
           <button type="submit" disabled={loading} className="brand-btn-primary">
-            {loading ? "Publishing..." : "Publish"}
+            {loading ? t("updatesPublishing") : t("updatesPublish")}
           </button>
           {status ? <p className="text-sm text-brandYellow">{status}</p> : null}
         </form>
       ) : (
-        <p className="text-sm text-white/80">Latest posts and reels from Sakhi Non-Veg Pickles.</p>
+        <p className="text-sm text-white/80">{t("updatesLatest")}</p>
       )}
 
       <div className="space-y-4">
-        {updates.length === 0 ? <p>No updates yet.</p> : null}
+        {updates.length === 0 ? <p>{t("updatesEmpty")}</p> : null}
         {updates.map((item) => (
           <article key={item._id} className="brand-card p-4">
             <div className="mb-1 flex items-center justify-between gap-3">
@@ -189,9 +191,9 @@ export default function UpdatesPage() {
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs uppercase">{item.type}</span>
             </div>
             {item.content ? <p className="text-white/85">{item.content}</p> : null}
-            <MediaPreview mediaUrl={item.mediaUrl} />
+            <MediaPreview mediaUrl={item.mediaUrl} openLabel={t("updatesOpenMedia")} />
             <p className="mt-3 text-xs text-white/60">
-              Posted by {item.createdBy || "Sakhi Team"} • {new Date(item.createdAt).toLocaleString()}
+              {t("updatesPostedBy")} {item.createdBy || "Sakhi Team"} - {new Date(item.createdAt).toLocaleString()}
             </p>
             {isAdmin ? (
               <button
@@ -199,7 +201,7 @@ export default function UpdatesPage() {
                 onClick={() => onDelete(item._id)}
                 className="mt-3 rounded-lg bg-red-600 px-3 py-2 text-sm"
               >
-                Delete
+                {t("updatesDelete")}
               </button>
             ) : null}
           </article>

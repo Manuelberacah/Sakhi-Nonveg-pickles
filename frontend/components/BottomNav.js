@@ -8,7 +8,7 @@ import { useApp } from "./AppContext";
 const NavItem = ({ href, label, active, count }) => (
   <Link
     href={href}
-    className={`relative rounded-lg px-4 py-2 text-sm font-semibold transition ${
+    className={`relative rounded-lg px-4 py-2 text-base font-semibold transition ${
       active ? "bg-brandYellow text-black" : "text-white hover:bg-white/10"
     }`}
   >
