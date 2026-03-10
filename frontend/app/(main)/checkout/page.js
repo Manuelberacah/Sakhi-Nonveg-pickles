@@ -19,11 +19,12 @@ const regionCharge = {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, clearCart } = useApp();
+  const { cart, clearCart, user } = useApp();
   const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");
   const [region, setRegion] = useState("andhra-pradesh");
   const [status, setStatus] = useState("");
+  const [statusType, setStatusType] = useState("info");
   const [loading, setLoading] = useState(false);
 
   const subtotal = useMemo(
@@ -34,18 +35,80 @@ export default function CheckoutPage() {
   const delivery = regionCharge[region];
   const total = subtotal + delivery;
 
+  const loadRazorpay = () =>
+    new Promise((resolve) => {
+      if (typeof window === "undefined") return resolve(false);
+      if (window.Razorpay) return resolve(true);
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+
   const handleOrder = async (e) => {
     e.preventDefault();
     setLoading(true);
     setStatus("");
+    setStatusType("info");
 
     try {
-      await api.post("/orders/checkout", { address, pincode, region });
-      await clearCart();
-      setStatus("Order placed successfully. Confirmation sent to Sakhi team.");
-      setTimeout(() => router.push("/home"), 1500);
+      const loaded = await loadRazorpay();
+      if (!loaded) {
+        setStatus("Razorpay failed to load. Please try again.");
+        setStatusType("error");
+        return;
+      }
+
+      const orderRes = await api.post("/orders/razorpay/order", { address, pincode, region });
+      const { orderId, amount, currency, keyId } = orderRes.data;
+
+      const options = {
+        key: keyId,
+        amount,
+        currency,
+        name: "Sakhi Non-Veg Pickles",
+        description: "Order payment",
+        order_id: orderId,
+        prefill: {
+          name: user?.name || "",
+          email: user?.email || ""
+        },
+        handler: async (response) => {
+          try {
+            await api.post("/orders/razorpay/verify", {
+              ...response,
+              address,
+              pincode,
+              region
+            });
+            await clearCart();
+            setStatus("Order placed successfully. Confirmation sent to Sakhi team.");
+            setStatusType("success");
+            setTimeout(() => router.push("/home"), 1500);
+          } catch (error) {
+            setStatus(error.response?.data?.message || "Payment verification failed");
+            setStatusType("error");
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setStatus("Payment cancelled. Please try again.");
+            setStatusType("error");
+          }
+        },
+        theme: { color: "#C10F1A" }
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on("payment.failed", () => {
+        setStatus("Payment failed. Please try again.");
+        setStatusType("error");
+      });
+      razorpay.open();
     } catch (error) {
       setStatus(error.response?.data?.message || "Failed to place order");
+      setStatusType("error");
     } finally {
       setLoading(false);
     }
@@ -92,7 +155,19 @@ export default function CheckoutPage() {
         <button disabled={loading} className="brand-btn-primary w-full" type="submit">
           {loading ? "Placing order..." : "Place Order"}
         </button>
-        {status ? <p className="text-sm text-brandYellow">{status}</p> : null}
+        {status ? (
+          <div
+            className={`rounded-xl border px-3 py-2 text-sm ${
+              statusType === "success"
+                ? "border-green-500/40 bg-green-500/10 text-green-200"
+                : statusType === "error"
+                  ? "border-red-500/40 bg-red-500/10 text-red-200"
+                  : "border-white/10 bg-white/5 text-white/80"
+            }`}
+          >
+            {status}
+          </div>
+        ) : null}
       </form>
     </section>
   );

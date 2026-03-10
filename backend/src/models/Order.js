@@ -25,7 +25,11 @@ const orderSchema = new mongoose.Schema(
     },
     deliveryCharge: { type: Number, required: true },
     totalAmount: { type: Number, required: true },
-    status: { type: String, default: "placed" }
+    status: { type: String, default: "placed" },
+    paymentProvider: { type: String, default: "razorpay" },
+    paymentOrderId: { type: String },
+    paymentId: { type: String },
+    paymentSignature: { type: String }
   },
   { timestamps: true }
 );
