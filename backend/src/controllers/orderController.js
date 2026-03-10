@@ -58,6 +58,8 @@ export const checkout = async (req, res) => {
 
     return res.status(201).json({ order });
   } catch (error) {
+    console.error("Checkout failed:", error?.message || error);
+    if (error?.stack) console.error(error.stack);
     return res.status(500).json({ message: "Checkout failed", error: error.message });
   }
 };

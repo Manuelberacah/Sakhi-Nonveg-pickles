@@ -56,6 +56,13 @@ const MainHeader = () => {
           {open ? (
             <div className="absolute right-0 top-full z-50 mt-2 w-48 space-y-1 rounded-xl border border-white/10 bg-black p-2">
               <Link
+                href="/profile"
+                onClick={() => setOpen(false)}
+                className="block rounded-lg px-3 py-2 text-sm hover:bg-white/10"
+              >
+                {t("yourOrders")}
+              </Link>
+              <Link
                 href="/updates"
                 onClick={() => setOpen(false)}
                 className="block rounded-lg px-3 py-2 text-sm hover:bg-white/10"
