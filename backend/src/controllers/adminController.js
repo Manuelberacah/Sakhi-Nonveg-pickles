@@ -35,7 +35,7 @@ export const getOverview = async (_req, res) => {
   try {
     const [users, orders, products] = await Promise.all([
       User.countDocuments(),
-      Order.countDocuments(),
+      Order.countDocuments({ status: "paid" }),
       Product.countDocuments()
     ]);
 
@@ -136,7 +136,7 @@ export const deleteProductAdmin = async (req, res) => {
 
 export const getOrdersAdmin = async (_req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const orders = await Order.find({ status: "paid" }).sort({ createdAt: -1 });
     return res.json(orders);
   } catch (error) {
     return res.status(500).json({ message: "Failed to fetch orders", error: error.message });

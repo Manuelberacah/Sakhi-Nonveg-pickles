@@ -187,6 +187,7 @@ export const verifyRazorpayPayment = async (req, res) => {
       region,
       deliveryCharge,
       totalAmount,
+      status: "paid",
       paymentProvider: "razorpay",
       paymentOrderId: razorpay_order_id,
       paymentId: razorpay_payment_id,
