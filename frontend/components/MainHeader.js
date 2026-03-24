@@ -32,7 +32,7 @@ const MainHeader = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 bg-black/70 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-white/10 bg-black backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Link href="/home" className="text-lg font-extrabold text-brandYellow">
           Sakhi Non-Veg Pickles
@@ -41,7 +41,7 @@ const MainHeader = () => {
           ref={dropdownRef}
           className="relative flex items-center gap-3"
         >
-          <ThemeToggle />
+          <ThemeToggle className="theme-toggle-header" />
           {user ? (
             <>
               <button
@@ -52,7 +52,7 @@ const MainHeader = () => {
                 {user.name || t("profile")}
               </button>
               {open ? (
-                <div className="absolute right-0 top-full z-50 mt-2 w-48 space-y-1 rounded-xl border border-white/10 bg-black p-2">
+                <div className="absolute right-0 top-full z-50 mt-2 w-48 space-y-1 rounded-xl border border-white/10 bg-black text-white shadow-xl">
                   <Link
                     href="/profile"
                     onClick={() => setOpen(false)}

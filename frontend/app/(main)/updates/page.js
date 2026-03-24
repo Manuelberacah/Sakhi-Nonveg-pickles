@@ -33,7 +33,7 @@ const MediaPreview = ({ mediaUrl, openLabel }) => {
         <iframe
           src={yt}
           title="YouTube update"
-          className="h-72 w-full"
+          className="aspect-video w-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
         />
@@ -46,7 +46,7 @@ const MediaPreview = ({ mediaUrl, openLabel }) => {
       <img
         src={mediaUrl}
         alt="Update media"
-        className="mt-3 w-full rounded-xl border border-white/10 object-cover"
+        className="mt-3 w-full max-h-96 rounded-xl border border-white/10 object-cover"
       />
     );
   }
@@ -54,7 +54,7 @@ const MediaPreview = ({ mediaUrl, openLabel }) => {
   if (isVideoUrl(mediaUrl)) {
     return (
       <video
-        className="mt-3 w-full rounded-xl border border-white/10"
+        className="mt-3 w-full max-h-96 rounded-xl border border-white/10"
         controls
         autoPlay
         muted
@@ -73,7 +73,7 @@ const MediaPreview = ({ mediaUrl, openLabel }) => {
         <iframe
           src={`${ig}?autoplay=1`}
           title="Instagram update"
-          className="h-[620px] w-full md:h-[720px]"
+          className="h-[520px] w-full sm:h-[620px] md:h-[720px]"
           scrolling="no"
           allow="autoplay; encrypted-media; clipboard-write; picture-in-picture; web-share"
           allowFullScreen
@@ -135,7 +135,7 @@ export default function UpdatesPage() {
   };
 
   return (
-    <section className="mx-auto max-w-4xl space-y-6">
+    <section className="mx-auto w-full max-w-4xl space-y-6 px-4 pb-24">
       <h1 className="text-3xl font-black text-brandYellow">{t("updatesTitle")}</h1>
 
       {isAdmin ? (
@@ -146,19 +146,19 @@ export default function UpdatesPage() {
             value={form.title}
             onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
             placeholder={t("updatesTitlePlaceholder")}
-            className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
+            className="adaptive-input w-full rounded-xl border p-3"
           />
           <textarea
             value={form.content}
             onChange={(e) => setForm((prev) => ({ ...prev, content: e.target.value }))}
             placeholder={t("updatesDescriptionPlaceholder")}
-            className="h-24 w-full rounded-xl border border-white/20 bg-black/30 p-3"
+            className="adaptive-input h-24 w-full rounded-xl border p-3"
           />
           <div className="grid gap-3 md:grid-cols-2">
             <select
               value={form.type}
               onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value }))}
-              className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
+              className="adaptive-input w-full rounded-xl border p-3"
             >
               {types.map((type) => (
                 <option key={type} value={type} className="text-black">
@@ -170,7 +170,7 @@ export default function UpdatesPage() {
               value={form.mediaUrl}
               onChange={(e) => setForm((prev) => ({ ...prev, mediaUrl: e.target.value }))}
               placeholder={t("updatesMediaPlaceholder")}
-              className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
+              className="adaptive-input w-full rounded-xl border p-3"
             />
           </div>
           <button type="submit" disabled={loading} className="brand-btn-primary">
@@ -185,12 +185,16 @@ export default function UpdatesPage() {
       <div className="space-y-4">
         {updates.length === 0 ? <p>{t("updatesEmpty")}</p> : null}
         {updates.map((item) => (
-          <article key={item._id} className="brand-card p-4">
-            <div className="mb-1 flex items-center justify-between gap-3">
-              <h3 className="text-xl font-bold text-brandYellow">{item.title}</h3>
+          <article key={item._id} className="brand-card w-full break-words p-4">
+            <div className="mb-1 flex min-w-0 items-center justify-between gap-3">
+              <h3 className="min-w-0 break-words text-xl font-bold text-brandYellow">
+                {item.title}
+              </h3>
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs uppercase">{item.type}</span>
             </div>
-            {item.content ? <p className="text-white/85">{item.content}</p> : null}
+            {item.content ? (
+              <p className="break-words text-white/85">{item.content}</p>
+            ) : null}
             <MediaPreview mediaUrl={item.mediaUrl} openLabel={t("updatesOpenMedia")} />
             <p className="mt-3 text-xs text-white/60">
               {t("updatesPostedBy")} {item.createdBy || "Sakhi Team"} - {new Date(item.createdAt).toLocaleString()}

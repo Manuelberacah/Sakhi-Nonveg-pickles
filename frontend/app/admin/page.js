@@ -348,7 +348,8 @@ export default function AdminPage() {
           <div className="space-y-2">
             {users.slice(0, 8).map((item) => (
               <p key={item._id} className="text-sm">
-                {item.name} - <span className="text-white/70">{item.email}</span>
+                {item.name} -{" "}
+                <span className="text-white/70">{item.email || item.phone || "-"}</span>
               </p>
             ))}
           </div>

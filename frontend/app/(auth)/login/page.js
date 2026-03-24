@@ -18,7 +18,7 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useApp();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ identifier: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
@@ -28,16 +28,19 @@ export default function LoginPage() {
 
     try {
       if (
-        form.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
+        form.identifier.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
         form.password === ADMIN_PASSWORD
       ) {
-        const res = await api.post("/admin/login", form);
+        const res = await api.post("/admin/login", {
+          email: ADMIN_EMAIL,
+          password: form.password
+        });
         localStorage.setItem(ADMIN_TOKEN_KEY, res.data.token);
         router.push("/admin");
         return;
       }
 
-      await login(form);
+      await login({ identifier: form.identifier, password: form.password });
       const next = searchParams.get("next");
       router.push(next || "/home");
     } catch (err) {
@@ -60,12 +63,12 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-brandYellow">{t("login")}</h1>
         {error ? <p className="text-sm text-red-400">{error}</p> : null}
         <input
-          type="email"
-          placeholder={t("email")}
+          type="text"
+          placeholder={t("emailOrPhone")}
           required
           className="adaptive-input w-full rounded-xl border p-3"
-          value={form.email}
-          onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+          value={form.identifier}
+          onChange={(e) => setForm((prev) => ({ ...prev, identifier: e.target.value }))}
         />
         <input
           type={showPassword ? "text" : "password"}

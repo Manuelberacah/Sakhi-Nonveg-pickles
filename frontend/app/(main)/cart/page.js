@@ -29,7 +29,7 @@ export default function CartPage() {
   const deliveryCharge = regionCharges["rest-of-india"];
   const total = subtotal + deliveryCharge;
 
-  if (!cart.length) return <p>Your cart is empty.</p>;
+  if (!cart.length) return <p>{t("cartEmpty")}</p>;
 
   return (
     <section className="space-y-5">
@@ -41,8 +41,12 @@ export default function CartPage() {
         return (
           <article key={`${item.product._id}-${item.size}`} className="brand-card p-4">
             <h3 className="text-lg font-semibold">{productName}</h3>
-            <p className="text-sm text-white/70">Size: {item.size}</p>
-            <p className="text-sm text-white/70">Price: Rs.{price}</p>
+            <p className="text-sm text-white/70">
+              {t("sizeLabel")}: {item.size}
+            </p>
+            <p className="text-sm text-white/70">
+              {t("priceLabel")}: Rs.{price}
+            </p>
             <div className="mt-3 flex items-center gap-2">
               <button
                 type="button"
@@ -64,18 +68,26 @@ export default function CartPage() {
                 onClick={() => removeCartItem(item.product._id, item.size)}
                 className="ml-auto rounded bg-red-500 px-3 py-1 text-sm"
               >
-                Remove
+                {t("remove")}
               </button>
             </div>
-            <p className="mt-2 text-sm text-brandYellow">Subtotal: Rs.{rowSubtotal}</p>
+            <p className="mt-2 text-sm text-brandYellow">
+              {t("subtotalLabel")}: Rs.{rowSubtotal}
+            </p>
           </article>
         );
       })}
 
       <div className="brand-card space-y-2 p-4">
-        <p>Subtotal: Rs.{subtotal}</p>
-        <p>Delivery Charge: Rs.{deliveryCharge}</p>
-        <p className="text-xl font-bold">Total: Rs.{total}</p>
+        <p>
+          {t("subtotalLabel")}: Rs.{subtotal}
+        </p>
+        <p>
+          {t("deliveryCharge")}: Rs.{deliveryCharge}
+        </p>
+        <p className="text-xl font-bold">
+          {t("totalLabel")}: Rs.{total}
+        </p>
         <button
           type="button"
           className="brand-btn-primary mt-2 w-full text-center"
@@ -87,7 +99,7 @@ export default function CartPage() {
             }
           }}
         >
-          Proceed to Checkout
+          {t("proceedToCheckout")}
         </button>
       </div>
     </section>

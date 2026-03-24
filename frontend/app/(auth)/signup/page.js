@@ -13,7 +13,7 @@ export default function SignupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signup } = useApp();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", identifier: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
@@ -52,12 +52,12 @@ export default function SignupPage() {
           onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
         />
         <input
-          type="email"
-          placeholder={t("email")}
+          type="text"
+          placeholder={t("emailOrPhone")}
           required
           className="adaptive-input w-full rounded-xl border p-3"
-          value={form.email}
-          onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+          value={form.identifier}
+          onChange={(e) => setForm((prev) => ({ ...prev, identifier: e.target.value }))}
         />
         <input
           type={showPassword ? "text" : "password"}

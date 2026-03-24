@@ -25,7 +25,7 @@ const BottomNav = () => {
   const { cart, wishlist, user } = useApp();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/80 backdrop-blur-md">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 p-3">
         <NavItem href="/cart" label={t("cart")} active={pathname === "/cart"} count={cart.length} />
         <NavItem

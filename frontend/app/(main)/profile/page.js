@@ -38,7 +38,8 @@ export default function ProfilePage() {
             <span className="text-white/70">{t("name")}:</span> {user?.name}
           </p>
           <p>
-            <span className="text-white/70">{t("email")}:</span> {user?.email}
+            <span className="text-white/70">{t("emailOrPhone")}:</span>{" "}
+            {user?.email || user?.phone || "-"}
           </p>
         </div>
       </div>

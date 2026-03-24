@@ -16,6 +16,11 @@ body {
   min-height: 100vh;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 html[lang="te"] body {
   font-family: var(--font-telugu), var(--font-sans), sans-serif;
 }
@@ -78,4 +83,32 @@ html.light .adaptive-muted {
 
 html.light .adaptive-input {
   @apply border-black/15 bg-slate-200 text-black;
+}
+
+html.light .text-white\/60 {
+  color: rgb(17 24 39 / 0.6);
+}
+
+html.light .text-white\/70 {
+  color: rgb(17 24 39 / 0.7);
+}
+
+html.light .text-white\/80 {
+  color: rgb(17 24 39 / 0.8);
+}
+
+html.light .text-white\/85 {
+  color: rgb(17 24 39 / 0.85);
+}
+
+html.light .text-white\/90 {
+  color: rgb(17 24 39 / 0.9);
+}
+
+html.light .theme-toggle {
+  @apply border-black/20 bg-black/5 text-black hover:bg-black/10;
+}
+
+html.light .theme-toggle-header {
+  @apply border-white/20 bg-white/10 text-white hover:bg-white/20;
 }

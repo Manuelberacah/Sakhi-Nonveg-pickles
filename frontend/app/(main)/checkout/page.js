@@ -4,10 +4,12 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "../../../components/AppContext";
 import { api } from "../../../lib/api";
+import { useTranslation } from "react-i18next";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, clearCart, user } = useApp();
+  const { t } = useTranslation();
   const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");
   const [pincodeError, setPincodeError] = useState("");
@@ -45,18 +47,18 @@ export default function CheckoutPage() {
     try {
       const loaded = await loadRazorpay();
       if (!loaded) {
-        setStatus("Razorpay failed to load. Please try again.");
+        setStatus(t("razorpayLoadFail"));
         setStatusType("error");
         return;
       }
 
       if (!/^\d{6}$/.test(String(pincode || "").trim())) {
-        setStatus("Please enter a valid 6-digit pincode.");
+        setStatus(t("pincodeEnterValid"));
         setStatusType("error");
         return;
       }
       if (!pincodeInfo) {
-        setStatus("Please enter a valid pincode to continue.");
+        setStatus(t("pincodeEnterToContinue"));
         setStatusType("error");
         return;
       }
@@ -83,17 +85,17 @@ export default function CheckoutPage() {
               pincode
             });
             await clearCart();
-            setStatus("Order placed successfully. Confirmation sent to Sakhi team.");
+            setStatus(t("orderPlacedSuccess"));
             setStatusType("success");
             setTimeout(() => router.push("/home"), 1500);
           } catch (error) {
-            setStatus(error.response?.data?.message || "Payment verification failed");
+            setStatus(error.response?.data?.message || t("paymentVerifyFailed"));
             setStatusType("error");
           }
         },
         modal: {
           ondismiss: () => {
-            setStatus("Payment cancelled. Please try again.");
+            setStatus(t("paymentCancelled"));
             setStatusType("error");
           }
         },
@@ -102,40 +104,40 @@ export default function CheckoutPage() {
 
       const razorpay = new window.Razorpay(options);
       razorpay.on("payment.failed", () => {
-        setStatus("Payment failed. Please try again.");
+        setStatus(t("paymentFailed"));
         setStatusType("error");
       });
       razorpay.open();
     } catch (error) {
-      setStatus(error.response?.data?.message || "Failed to place order");
+      setStatus(error.response?.data?.message || t("orderPlaceFailed"));
       setStatusType("error");
     } finally {
       setLoading(false);
     }
   };
 
-  if (!cart.length) return <p>Add items to cart before checkout.</p>;
+  if (!cart.length) return <p>{t("addItemsBeforeCheckout")}</p>;
 
   return (
     <section className="mx-auto max-w-2xl">
       <form onSubmit={handleOrder} className="brand-card space-y-4 p-5">
-        <h1 className="text-2xl font-bold text-brandYellow">Checkout</h1>
+        <h1 className="text-2xl font-bold text-brandYellow">{t("checkoutTitle")}</h1>
         <textarea
           required
-          placeholder="Address"
+          placeholder={t("addressPlaceholder")}
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           className="h-24 w-full rounded-xl border border-white/20 bg-black/30 p-3"
         />
         <input
           required
-          placeholder="Pincode"
+          placeholder={t("pincodePlaceholder")}
           value={pincode}
           onChange={async (e) => {
             const value = e.target.value.replace(/\D/g, "").slice(0, 6);
             setPincode(value);
             if (value.length > 0 && value.length < 6) {
-              setPincodeError("Pincode must be 6 digits.");
+              setPincodeError(t("pincodeMustBe6"));
               setPincodeInfo(null);
               return;
             }
@@ -147,7 +149,7 @@ export default function CheckoutPage() {
                 setPincodeError("");
               } catch (error) {
                 setPincodeInfo(null);
-                setPincodeError(error.response?.data?.message || "Invalid pincode.");
+                setPincodeError(error.response?.data?.message || t("pincodeEnterValid"));
               } finally {
                 setPincodeLoading(false);
               }
@@ -159,26 +161,32 @@ export default function CheckoutPage() {
           className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
         />
         {pincodeError ? <p className="text-sm text-red-400">{pincodeError}</p> : null}
-        {pincodeLoading ? <p className="text-sm text-white/70">Checking pincode...</p> : null}
+        {pincodeLoading ? <p className="text-sm text-white/70">{t("pincodeChecking")}</p> : null}
         {pincodeInfo ? (
           <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white/85">
             <p>
               {pincodeInfo.area}, {pincodeInfo.district}, {pincodeInfo.state}
             </p>
             <p className="mt-1 text-brandYellow">
-              Delivery: Rs.{pincodeInfo.deliveryCharge}
+              {t("deliveryLabel")}: Rs.{pincodeInfo.deliveryCharge}
             </p>
           </div>
         ) : null}
 
         <div className="rounded-xl bg-white/5 p-3 text-sm">
-          <p>Subtotal: Rs.{subtotal}</p>
-          <p>Delivery: Rs.{delivery}</p>
-          <p className="mt-1 text-lg font-bold">Total: Rs.{total}</p>
+          <p>
+            {t("subtotalLabel")}: Rs.{subtotal}
+          </p>
+          <p>
+            {t("deliveryLabel")}: Rs.{delivery}
+          </p>
+          <p className="mt-1 text-lg font-bold">
+            {t("totalLabel")}: Rs.{total}
+          </p>
         </div>
 
         <button disabled={loading} className="brand-btn-primary w-full" type="submit">
-          {loading ? "Placing order..." : "Place Order"}
+          {loading ? t("placingOrder") : t("placeOrder")}
         </button>
         {status ? (
           <div

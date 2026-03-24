@@ -47,7 +47,7 @@ export default function ProductDetailsPage() {
         <p className="text-white/80">{productDescription}</p>
 
         <div>
-          <p className="mb-2 text-sm text-white/70">Select size</p>
+          <p className="mb-2 text-sm text-white/70">{t("selectSize")}</p>
           <div className="flex gap-3">
             {sizes.map((option) => (
               <button
