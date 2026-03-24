@@ -2,6 +2,7 @@ import "../styles/globals.css";
 import Providers from "../components/Providers";
 import FloatingWhatsApp from "../components/FloatingWhatsApp";
 import UpdatesButton from "../components/UpdatesButton";
+import PageTransition from "../components/PageTransition";
 import { Noto_Sans_Telugu, Sora } from "next/font/google";
 
 const sans = Sora({
@@ -26,7 +27,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${sans.variable} ${telugu.variable}`}>
         <Providers>
-          {children}
+          <PageTransition>{children}</PageTransition>
           <UpdatesButton />
           <FloatingWhatsApp />
         </Providers>

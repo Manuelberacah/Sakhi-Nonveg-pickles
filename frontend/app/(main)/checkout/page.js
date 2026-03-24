@@ -5,24 +5,14 @@ import { useRouter } from "next/navigation";
 import { useApp } from "../../../components/AppContext";
 import { api } from "../../../lib/api";
 
-const regions = [
-  { value: "andhra-pradesh", label: "Andhra Pradesh (Rs.80)" },
-  { value: "south-india", label: "South India (Rs.120)" },
-  { value: "rest-of-india", label: "Rest of India (Rs.180)" }
-];
-
-const regionCharge = {
-  "andhra-pradesh": 80,
-  "south-india": 120,
-  "rest-of-india": 180
-};
-
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, clearCart, user } = useApp();
   const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");
-  const [region, setRegion] = useState("andhra-pradesh");
+  const [pincodeError, setPincodeError] = useState("");
+  const [pincodeInfo, setPincodeInfo] = useState(null);
+  const [pincodeLoading, setPincodeLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [statusType, setStatusType] = useState("info");
   const [loading, setLoading] = useState(false);
@@ -32,7 +22,7 @@ export default function CheckoutPage() {
     [cart]
   );
 
-  const delivery = regionCharge[region];
+  const delivery = pincodeInfo?.deliveryCharge || 0;
   const total = subtotal + delivery;
 
   const loadRazorpay = () =>
@@ -60,7 +50,18 @@ export default function CheckoutPage() {
         return;
       }
 
-      const orderRes = await api.post("/orders/razorpay/order", { address, pincode, region });
+      if (!/^\d{6}$/.test(String(pincode || "").trim())) {
+        setStatus("Please enter a valid 6-digit pincode.");
+        setStatusType("error");
+        return;
+      }
+      if (!pincodeInfo) {
+        setStatus("Please enter a valid pincode to continue.");
+        setStatusType("error");
+        return;
+      }
+
+      const orderRes = await api.post("/orders/razorpay/order", { address, pincode });
       const { orderId, amount, currency, keyId } = orderRes.data;
 
       const options = {
@@ -79,8 +80,7 @@ export default function CheckoutPage() {
             await api.post("/orders/razorpay/verify", {
               ...response,
               address,
-              pincode,
-              region
+              pincode
             });
             await clearCart();
             setStatus("Order placed successfully. Confirmation sent to Sakhi team.");
@@ -131,20 +131,45 @@ export default function CheckoutPage() {
           required
           placeholder="Pincode"
           value={pincode}
-          onChange={(e) => setPincode(e.target.value)}
+          onChange={async (e) => {
+            const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+            setPincode(value);
+            if (value.length > 0 && value.length < 6) {
+              setPincodeError("Pincode must be 6 digits.");
+              setPincodeInfo(null);
+              return;
+            }
+            if (value.length === 6) {
+              setPincodeLoading(true);
+              try {
+                const res = await api.get(`/orders/pincode/${value}`);
+                setPincodeInfo(res.data);
+                setPincodeError("");
+              } catch (error) {
+                setPincodeInfo(null);
+                setPincodeError(error.response?.data?.message || "Invalid pincode.");
+              } finally {
+                setPincodeLoading(false);
+              }
+            } else {
+              setPincodeError("");
+              setPincodeInfo(null);
+            }
+          }}
           className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
         />
-        <select
-          value={region}
-          onChange={(e) => setRegion(e.target.value)}
-          className="w-full rounded-xl border border-white/20 bg-black/30 p-3"
-        >
-          {regions.map((item) => (
-            <option key={item.value} value={item.value} className="text-black">
-              {item.label}
-            </option>
-          ))}
-        </select>
+        {pincodeError ? <p className="text-sm text-red-400">{pincodeError}</p> : null}
+        {pincodeLoading ? <p className="text-sm text-white/70">Checking pincode...</p> : null}
+        {pincodeInfo ? (
+          <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white/85">
+            <p>
+              {pincodeInfo.area}, {pincodeInfo.district}, {pincodeInfo.state}
+            </p>
+            <p className="mt-1 text-brandYellow">
+              Delivery: Rs.{pincodeInfo.deliveryCharge}
+            </p>
+          </div>
+        ) : null}
 
         <div className="rounded-xl bg-white/5 p-3 text-sm">
           <p>Subtotal: Rs.{subtotal}</p>

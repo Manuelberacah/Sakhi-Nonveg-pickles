@@ -10,9 +10,14 @@ const ProductCard = ({ product }) => {
   const productName = getProductName(product, i18n.language, t);
 
   return (
-    <div className="brand-card overflow-hidden shadow-brand">
-      <div className="relative h-44 w-full">
-        <FallbackImage src={product.image} alt={productName} fill className="object-cover" />
+    <div className="group brand-card overflow-hidden shadow-brand transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-brandRed/30">
+      <div className="relative h-44 w-full overflow-hidden">
+        <FallbackImage
+          src={product.image}
+          alt={productName}
+          fill
+          className="object-cover transition duration-500 group-hover:scale-105"
+        />
       </div>
       <div className="space-y-3 p-4">
         <h3 className="text-lg font-semibold">{productName}</h3>

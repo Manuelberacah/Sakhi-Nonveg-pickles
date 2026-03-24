@@ -1,17 +1,17 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../../../components/AppContext";
-import BackButton from "../../../components/BackButton";
 import ThemeToggle from "../../../components/ThemeToggle";
 
 export default function SignupPage() {
   const { t } = useTranslation();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signup } = useApp();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +23,8 @@ export default function SignupPage() {
 
     try {
       await signup(form);
-      router.push("/home");
+      const next = searchParams.get("next");
+      router.push(next || "/home");
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed");
     }
@@ -38,8 +39,7 @@ export default function SignupPage() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="flex items-center justify-between">
-          <BackButton fallbackHref="/landing" />
+        <div className="flex justify-end">
           <ThemeToggle />
         </div>
         <h1 className="text-2xl font-bold text-brandYellow">{t("signup")}</h1>

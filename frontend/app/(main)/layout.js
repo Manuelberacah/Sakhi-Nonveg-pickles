@@ -12,8 +12,14 @@ const MainLayout = ({ children }) => {
   const { token, loading } = useApp();
 
   useEffect(() => {
-    if (!loading && !token && pathname !== "/login" && pathname !== "/signup") {
-      router.push("/login");
+    if (loading || token) return;
+
+    const publicPrefixes = ["/home", "/cart", "/wishlist", "/product", "/updates", "/settings", "/support"];
+    const isPublic =
+      publicPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+
+    if (!isPublic) {
+      router.push(`/login?next=${encodeURIComponent(pathname)}`);
     }
   }, [token, loading, pathname, router]);
 

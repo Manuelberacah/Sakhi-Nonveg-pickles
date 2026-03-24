@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../../../components/AppContext";
+import { useRouter } from "next/navigation";
 import { getProductName } from "../../../lib/productI18n";
 
 const regionCharges = {
@@ -13,7 +13,8 @@ const regionCharges = {
 };
 
 export default function CartPage() {
-  const { cart, updateCartItem, removeCartItem } = useApp();
+  const router = useRouter();
+  const { cart, updateCartItem, removeCartItem, token } = useApp();
   const { i18n, t } = useTranslation();
 
   const subtotal = useMemo(
@@ -75,9 +76,19 @@ export default function CartPage() {
         <p>Subtotal: Rs.{subtotal}</p>
         <p>Delivery Charge: Rs.{deliveryCharge}</p>
         <p className="text-xl font-bold">Total: Rs.{total}</p>
-        <Link href="/checkout" className="brand-btn-primary mt-2 w-full text-center">
+        <button
+          type="button"
+          className="brand-btn-primary mt-2 w-full text-center"
+          onClick={() => {
+            if (token) {
+              router.push("/checkout");
+            } else {
+              router.push("/login?next=/checkout");
+            }
+          }}
+        >
           Proceed to Checkout
-        </Link>
+        </button>
       </div>
     </section>
   );

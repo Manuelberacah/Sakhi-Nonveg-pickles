@@ -23,6 +23,9 @@ const orderSchema = new mongoose.Schema(
       enum: ["andhra-pradesh", "south-india", "rest-of-india"],
       required: true
     },
+    area: { type: String },
+    district: { type: String },
+    state: { type: String },
     deliveryCharge: { type: Number, required: true },
     totalAmount: { type: Number, required: true },
     status: { type: String, default: "placed" },

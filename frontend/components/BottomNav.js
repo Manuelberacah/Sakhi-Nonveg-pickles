@@ -24,8 +24,6 @@ const BottomNav = () => {
   const { t } = useTranslation();
   const { cart, wishlist, user } = useApp();
 
-  if (!user) return null;
-
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-center gap-3 p-3">

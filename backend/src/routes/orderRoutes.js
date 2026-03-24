@@ -4,12 +4,14 @@ import {
   createRazorpayOrder,
   getAdminProducts,
   getMyOrders,
+  getPincodeInfo,
   verifyRazorpayPayment
 } from "../controllers/orderController.js";
 import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
+router.get("/pincode/:pincode", getPincodeInfo);
 router.post("/checkout", authMiddleware, checkout);
 router.post("/razorpay/order", authMiddleware, createRazorpayOrder);
 router.post("/razorpay/verify", authMiddleware, verifyRazorpayPayment);

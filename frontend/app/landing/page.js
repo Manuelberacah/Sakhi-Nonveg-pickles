@@ -7,9 +7,11 @@ import { useEffect, useState } from "react";
 import i18n from "../../lib/i18n";
 import { useTranslation } from "react-i18next";
 import ThemeToggle from "../../components/ThemeToggle";
+import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
   const { t } = useTranslation();
+  const router = useRouter();
   const [logoSrc, setLogoSrc] = useState("/brand/logo.png");
   const [heroSrc, setHeroSrc] = useState("/brand/logo-full.png.jpg");
   const [showLang, setShowLang] = useState(true);
@@ -129,7 +131,15 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9 }}
-          className="relative mx-auto grid max-w-6xl gap-6 rounded-3xl border border-white/10 bg-black/40 p-5 md:grid-cols-[1.15fr_0.85fr] md:p-8"
+          className="relative mx-auto grid max-w-6xl cursor-pointer gap-6 rounded-3xl border border-white/10 bg-black/40 p-5 md:grid-cols-[1.15fr_0.85fr] md:p-8"
+          onClick={() => router.push("/home")}
+          role="link"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              router.push("/home");
+            }
+          }}
         >
           <div className="space-y-4">
             <p className="inline-block rounded-full bg-brandRed/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-brandYellow">
@@ -143,7 +153,7 @@ export default function LandingPage() {
             </p>
             <div className="grid gap-2 text-sm text-white/90">
               <p>
-                <span className="font-semibold text-brandYellow">{t("landingPhoneLabel")}:</span> 8143156089, 80153 0090
+                <span className="font-semibold text-brandYellow">{t("landingPhoneLabel")}:</span> 8143156089, 8015300905
               </p>
               <p>
                 <span className="font-semibold text-brandYellow">{t("landingEmailLabel")}:</span>{" "}
@@ -199,25 +209,26 @@ export default function LandingPage() {
         {sections.map((item, index) => {
           const reverse = index % 2 === 1;
           return (
-            <motion.article
-              key={item.title}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: 0.7 }}
-              className={`grid items-center gap-6 rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 ${
-                reverse ? "md:grid-cols-[0.95fr_1.05fr]" : "md:grid-cols-[1.05fr_0.95fr]"
-              }`}
-            >
-              <div className={`${reverse ? "md:order-2" : ""} relative h-64 overflow-hidden rounded-2xl border border-white/10`}>
-                <Image src={item.image} alt={item.title} fill className="object-cover transition duration-500 hover:scale-105" />
-              </div>
-              <div className={`${reverse ? "md:order-1" : ""} space-y-3`}>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brandRed">{t("landingStoryLabel")}</p>
-                <h2 className="text-2xl font-black text-brandYellow md:text-3xl">{item.title}</h2>
-                <p className="text-white/85">{item.description}</p>
-              </div>
-            </motion.article>
+            <Link key={item.title} href="/home" className="block">
+              <motion.article
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{ duration: 0.7 }}
+                className={`grid items-center gap-6 rounded-2xl border border-white/10 bg-black/35 p-4 md:p-6 ${
+                  reverse ? "md:grid-cols-[0.95fr_1.05fr]" : "md:grid-cols-[1.05fr_0.95fr]"
+                }`}
+              >
+                <div className={`${reverse ? "md:order-2" : ""} relative h-64 overflow-hidden rounded-2xl border border-white/10`}>
+                  <Image src={item.image} alt={item.title} fill className="object-cover transition duration-500 hover:scale-105" />
+                </div>
+                <div className={`${reverse ? "md:order-1" : ""} space-y-3`}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brandRed">{t("landingStoryLabel")}</p>
+                  <h2 className="text-2xl font-black text-brandYellow md:text-3xl">{item.title}</h2>
+                  <p className="text-white/85">{item.description}</p>
+                </div>
+              </motion.article>
+            </Link>
           );
         })}
       </section>

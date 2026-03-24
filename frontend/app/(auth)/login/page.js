@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../../../components/AppContext";
-import BackButton from "../../../components/BackButton";
 import ThemeToggle from "../../../components/ThemeToggle";
 import { api } from "../../../lib/api";
 
@@ -17,6 +16,7 @@ const ADMIN_TOKEN_KEY = "sakhi_admin_token";
 export default function LoginPage() {
   const { t } = useTranslation();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useApp();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +38,8 @@ export default function LoginPage() {
       }
 
       await login(form);
-      router.push("/home");
+      const next = searchParams.get("next");
+      router.push(next || "/home");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }
@@ -53,8 +54,7 @@ export default function LoginPage() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="flex items-center justify-between">
-          <BackButton fallbackHref="/landing" />
+        <div className="flex justify-end">
           <ThemeToggle />
         </div>
         <h1 className="text-2xl font-bold text-brandYellow">{t("login")}</h1>
