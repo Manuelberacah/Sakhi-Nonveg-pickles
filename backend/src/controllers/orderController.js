@@ -3,8 +3,13 @@ import Product from "../models/Product.js";
 import User from "../models/User.js";
 import { sendOrderMail } from "../services/emailService.js";
 import { getDeliveryCharge, getRegionFromState, isValidPincode } from "../utils/delivery.js";
+import { createRequire } from "module";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+
+const require = createRequire(import.meta.url);
+const { getIndiaPincode } = require("india-pincode");
+const pincodeDB = getIndiaPincode();
 
 const assertRazorpayConfig = () => {
   if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
@@ -20,19 +25,18 @@ const getRazorpayClient = () => {
   });
 };
 
-const lookupPincode = async (pincode) => {
+const resolvePincode = (pincode) => {
   const pin = String(pincode || "").trim();
-  const response = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
-  const data = await response.json();
-  if (!Array.isArray(data) || !data[0] || data[0].Status !== "Success") {
-    return null;
-  }
-  const office = (data[0].PostOffice || [])[0];
-  if (!office) return null;
+  const result = pincodeDB.getByPincode(pin);
+  if (!result.success || !result.data?.data?.length) return null;
+  const entry = result.data.data[0];
+  const region = getRegionFromState(entry.state);
   return {
-    area: office.Name,
-    district: office.District,
-    state: office.State
+    area: entry.area,
+    district: entry.district,
+    state: entry.state,
+    region,
+    deliveryCharge: getDeliveryCharge(region)
   };
 };
 
@@ -46,7 +50,7 @@ export const checkout = async (req, res) => {
     if (!isValidPincode(pincode)) {
       return res.status(400).json({ message: "Invalid pincode" });
     }
-    const location = await lookupPincode(pincode);
+    const location = resolvePincode(pincode);
     if (!location) {
       return res.status(400).json({ message: "Invalid pincode" });
     }
@@ -70,8 +74,7 @@ export const checkout = async (req, res) => {
     });
 
     const productsAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
-    const region = getRegionFromState(location.state);
-    const deliveryCharge = getDeliveryCharge(region);
+    const { region, deliveryCharge } = location;
     const totalAmount = productsAmount + deliveryCharge;
 
     const order = await Order.create({
@@ -118,7 +121,7 @@ export const createRazorpayOrder = async (req, res) => {
     if (!isValidPincode(pincode)) {
       return res.status(400).json({ message: "Invalid pincode" });
     }
-    const location = await lookupPincode(pincode);
+    const location = resolvePincode(pincode);
     if (!location) {
       return res.status(400).json({ message: "Invalid pincode" });
     }
@@ -141,8 +144,7 @@ export const createRazorpayOrder = async (req, res) => {
     });
 
     const productsAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
-    const region = getRegionFromState(location.state);
-    const deliveryCharge = getDeliveryCharge(region);
+    const { region, deliveryCharge } = location;
     const totalAmount = productsAmount + deliveryCharge;
 
     const razorpay = getRazorpayClient();
@@ -185,7 +187,7 @@ export const verifyRazorpayPayment = async (req, res) => {
     if (!isValidPincode(pincode)) {
       return res.status(400).json({ message: "Invalid pincode" });
     }
-    const location = await lookupPincode(pincode);
+    const location = resolvePincode(pincode);
     if (!location) {
       return res.status(400).json({ message: "Invalid pincode" });
     }
@@ -218,8 +220,7 @@ export const verifyRazorpayPayment = async (req, res) => {
     });
 
     const productsAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
-    const region = getRegionFromState(location.state);
-    const deliveryCharge = getDeliveryCharge(region);
+    const { region, deliveryCharge } = location;
     const totalAmount = productsAmount + deliveryCharge;
 
     const order = await Order.create({
@@ -281,17 +282,11 @@ export const getPincodeInfo = async (req, res) => {
     if (!isValidPincode(pincode)) {
       return res.status(400).json({ message: "Invalid pincode" });
     }
-    const location = await lookupPincode(pincode);
+    const location = resolvePincode(pincode);
     if (!location) {
       return res.status(400).json({ message: "Invalid pincode" });
     }
-    const region = getRegionFromState(location.state);
-    const deliveryCharge = getDeliveryCharge(region);
-    return res.json({
-      ...location,
-      region,
-      deliveryCharge
-    });
+    return res.json(location);
   } catch (error) {
     return res.status(500).json({ message: "Failed to resolve pincode", error: error.message });
   }

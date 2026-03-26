@@ -165,7 +165,7 @@ export default function CheckoutPage() {
         {pincodeInfo ? (
           <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white/85">
             <p>
-              {pincodeInfo.area}, {pincodeInfo.district}, {pincodeInfo.state}
+              {pincodeInfo.district}, {pincodeInfo.state}
             </p>
             <p className="mt-1 text-brandYellow">
               {t("deliveryLabel")}: Rs.{pincodeInfo.deliveryCharge}
